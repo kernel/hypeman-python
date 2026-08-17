@@ -65,6 +65,32 @@ asyncio.run(main())
 
 Functionality between the synchronous and asynchronous clients is otherwise identical.
 
+## Exec and file copy
+
+The custom WebSocket APIs live under `hypeman.lib` and use the generated client's
+`base_url` and `api_key`:
+
+```python
+from hypeman import Hypeman
+from hypeman.lib import cp_from_instance, cp_to_instance, exec
+
+client = Hypeman()
+
+result = exec(client, "instance-id", ["sh", "-lc", "printf hello"])
+print(result.output.decode())
+print(result.exit_code)
+
+cp_to_instance(client, "instance-id", "./config", "/app/config")
+cp_from_instance(client, "instance-id", "/app/result.json", "./downloads")
+```
+
+`ExecResult.output` contains the server's merged stdout and stderr stream. The
+current protocol doesn't identify which stream produced each byte. Exec requests
+are dispatched once and aren't retried.
+
+The async equivalents are `exec_async`, `cp_to_instance_async`, and
+`cp_from_instance_async`.
+
 ### With aiohttp
 
 By default, the async client uses `httpx` for HTTP requests. However, for improved concurrency performance you may also use `aiohttp` as the HTTP backend.
@@ -248,10 +274,10 @@ In an API response, a field may be explicitly `null`, or missing entirely; in ei
 
 ```py
 if response.my_field is None:
-  if 'my_field' not in response.model_fields_set:
-    print('Got json like {}, without a "my_field" key present at all.')
-  else:
-    print('Got json like {"my_field": null}.')
+    if "my_field" not in response.model_fields_set:
+        print('Got json like {}, without a "my_field" key present at all.')
+    else:
+        print('Got json like {"my_field": null}.')
 ```
 
 ### Accessing raw response data (e.g. headers)
@@ -263,7 +289,7 @@ from hypeman import Hypeman
 
 client = Hypeman()
 response = client.health.with_raw_response.check()
-print(response.headers.get('X-My-Header'))
+print(response.headers.get("X-My-Header"))
 
 health = response.parse()  # get the object that `health.check()` would have returned
 print(health.status)
@@ -359,8 +385,8 @@ By default the library closes underlying HTTP connections whenever the client is
 from hypeman import Hypeman
 
 with Hypeman() as client:
-  # make requests here
-  ...
+    # make requests here
+    ...
 
 # HTTP client is now closed
 ```
@@ -385,6 +411,7 @@ You can determine the version that is being used at runtime with:
 
 ```py
 import hypeman
+
 print(hypeman.__version__)
 ```
 

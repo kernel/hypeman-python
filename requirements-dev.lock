@@ -143,6 +143,8 @@ typing-inspection==0.4.2
     # via pydantic
 virtualenv==20.36.1
     # via nox
+websockets==15.0.1
+    # via hypeman
 yarl==1.22.0
     # via aiohttp
 zipp==3.23.0
