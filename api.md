@@ -16,6 +16,26 @@ Methods:
 
 - <code title="get /health">client.health.<a href="./src/hypeman/resources/health.py">check</a>() -> <a href="./src/hypeman/types/health_check_response.py">HealthCheckResponse</a></code>
 
+# Capabilities
+
+Types:
+
+```python
+from hypeman.types import (
+    Capabilities,
+    CapabilitiesDefaultRuntime,
+    CapabilitiesHost,
+    CapabilitiesImages,
+    CapabilitiesNetwork,
+    CapabilitiesRuntime,
+    CapabilitiesServer,
+)
+```
+
+Methods:
+
+- <code title="get /capabilities">client.capabilities.<a href="./src/hypeman/resources/capabilities.py">get</a>() -> <a href="./src/hypeman/types/capabilities.py">Capabilities</a></code>
+
 # Images
 
 Types:
