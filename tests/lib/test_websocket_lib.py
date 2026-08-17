@@ -283,9 +283,10 @@ def test_cp_upload_file_preserves_mode_and_reports_progress(tmp_path: Path) -> N
 
 def test_cp_upload_archive_includes_root_ownership(tmp_path: Path) -> None:
     entry = _UploadEntry(tmp_path, "/guest/file", False, 0o644, 0, 0, 0)
+    request = json.loads(_request(entry))
 
-    assert json.loads(_request(entry))["uid"] == 0
-    assert json.loads(_request(entry))["gid"] == 0
+    assert request["uid"] == 0
+    assert request["gid"] == 0
 
 
 def test_cp_upload_directory_uses_one_connection_per_entry(tmp_path: Path) -> None:
