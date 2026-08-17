@@ -47,7 +47,12 @@ jobs:
           set -euo pipefail
           git remote add production \
             "https://x-access-token:${GH_TOKEN}@github.com/${PRODUCTION_REPO}.git"
-          git fetch production main
+          if git ls-remote --exit-code --heads production main >/dev/null 2>&1; then
+            git fetch production main
+            echo "has_main=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_main=false" >> "$GITHUB_OUTPUT"
+          fi
           if git ls-remote --exit-code --heads production next >/dev/null 2>&1; then
             git fetch production next
             echo "has_next=true" >> "$GITHUB_OUTPUT"
@@ -59,6 +64,7 @@ jobs:
         env:
           APP_SLUG: ${{ steps.production-token.outputs.app-slug }}
           GH_TOKEN: ${{ steps.production-token.outputs.token }}
+          HAS_MAIN: ${{ steps.production.outputs.has_main }}
           HAS_NEXT: ${{ steps.production.outputs.has_next }}
           PRODUCTION_REPO: kernel/hypeman-python
         run: |
@@ -103,6 +109,21 @@ jobs:
             exit 1
           }
 
+          if [ "$HAS_MAIN" != "true" ]; then
+            # The Python production repository started empty. Seed a minimal
+            # default branch so release-please can open the first next -> main
+            # release PR while preserving staging as a parent of that release.
+            git checkout --orphan stlc/bootstrap-main
+            git rm -rf .
+            git checkout origin/main -- \
+              .github/workflows/release-please.yml \
+              .release-please-manifest.json \
+              release-please-config.json
+            git commit -m 'chore: initialize SDK release history'
+            git push production HEAD:refs/heads/main
+            git fetch production main
+          fi
+
           if [ "$HAS_NEXT" = "true" ]; then
             git checkout -B stlc/promote-next production/next
           else
@@ -115,7 +136,11 @@ jobs:
             fi
           fi
           if ! git merge-base --is-ancestor origin/main HEAD; then
-            if ! git merge --no-edit origin/main; then
+            merge_args=(--no-edit)
+            if ! git merge-base production/main origin/main >/dev/null 2>&1; then
+              merge_args+=(--allow-unrelated-histories)
+            fi
+            if ! git merge "${merge_args[@]}" origin/main; then
               open_conflict_pr origin/main 'validated staging changes' true
             fi
           fi
