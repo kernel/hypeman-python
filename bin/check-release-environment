@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+errors=()
+
+if [ -z "${ADMIN_APP_ID}" ]; then
+  errors+=("The ADMIN_APP_ID secret has not been set.")
+fi
+
+if [ -z "${ADMIN_APP_PRIVATE_KEY}" ]; then
+  errors+=("The ADMIN_APP_PRIVATE_KEY secret has not been set.")
+fi
+
+lenErrors=${#errors[@]}
+
+if [[ "$lenErrors" -gt 0 ]]; then
+  echo -e "Found the following errors in the release environment:\n"
+
+  for error in "${errors[@]}"; do
+    echo -e "- $error\n"
+  done
+
+  exit 1
+fi
+
+echo "The environment is ready to push releases!"
