@@ -150,10 +150,12 @@ def _parse_message(frame: str) -> dict[str, object]:
     return message
 
 
-def _integer_field(message: dict[str, object], name: str, default: int | None = None) -> int:
+def _integer_field(
+    message: dict[str, object], name: str, default: int | None = None, maximum: int | None = None
+) -> int:
     value = message.get(name, default)
-    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
-        raise CopyProtocolError(f"cp header {name} must be a non-negative integer")
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0 or (maximum is not None and value > maximum):
+        raise CopyProtocolError(f"cp header {name} has an invalid integer value")
     return value
 
 
@@ -371,7 +373,7 @@ class _DownloadState:
         if self.header is not None:
             raise CopyProtocolError("cp sent a new header before ending the previous entry")
         target = self._safe_target(message.get("path"))
-        mode = _integer_field(message, "mode")
+        mode = _integer_field(message, "mode", maximum=0o777)
         size = _integer_field(message, "size")
         mtime = _integer_field(message, "mtime")
         uid = _integer_field(message, "uid", 0)
@@ -532,7 +534,7 @@ async def cp_from_instance_async(
     """Asynchronous counterpart to :func:`cp_from_instance`."""
 
     url, headers = connection_settings(client, instance_id, "cp")
-    state = await asyncio.to_thread(_DownloadState, Path(dst_path), archive, callbacks)
+    state = _DownloadState(Path(dst_path), archive, callbacks)
     try:
         async with connector(url, additional_headers=headers, max_size=None) as websocket:
             await websocket.send(_download_request(src_path, follow_symlinks))
@@ -541,7 +543,7 @@ async def cp_from_instance_async(
                     frame = await websocket.recv()
                 except Exception as exc:
                     raise CopyProtocolError("cp download ended before the final marker") from exc
-                await asyncio.to_thread(state.consume, frame)
+                state.consume(frame)
     except BaseException:
-        await asyncio.to_thread(state.abort)
+        state.abort()
         raise

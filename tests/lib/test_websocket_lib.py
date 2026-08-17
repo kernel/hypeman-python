@@ -468,3 +468,14 @@ def test_cp_download_rejects_malformed_control_frame(tmp_path: Path) -> None:
     connector = FakeConnector(deque([FakeWebSocket(deque(["not-json"]))]))
     with pytest.raises(CopyProtocolError, match="malformed JSON"):
         cp_from_instance(FakeClient(), "inst", "/guest", tmp_path, connector=connector)
+
+
+def test_exec_rejects_a_bare_command_string() -> None:
+    with pytest.raises(ValueError, match="argument sequence"):
+        exec(FakeClient(), "inst", "echo")
+
+
+def test_cp_download_rejects_invalid_mode(tmp_path: Path) -> None:
+    connector = FakeConnector(deque([FakeWebSocket(deque([file_header("file", size=0, mode=0o4777)]))]))
+    with pytest.raises(CopyProtocolError, match="mode"):
+        cp_from_instance(FakeClient(), "inst", "/guest/file", tmp_path, connector=connector)
