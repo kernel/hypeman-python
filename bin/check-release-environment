@@ -12,7 +12,7 @@ fi
 
 lenErrors=${#errors[@]}
 
-if [[ lenErrors -gt 0 ]]; then
+if [[ "$lenErrors" -gt 0 ]]; then
   echo -e "Found the following errors in the release environment:\n"
 
   for error in "${errors[@]}"; do

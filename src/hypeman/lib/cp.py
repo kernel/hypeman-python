@@ -58,8 +58,8 @@ class _UploadEntry:
     guest_path: str
     is_dir: bool
     mode: int
-    uid: int
-    gid: int
+    uid: int | None
+    gid: int | None
     size: int
 
 
@@ -91,8 +91,8 @@ def _upload_entries(
 
         is_dir = stat.S_ISDIR(info.st_mode)
         entry_mode = mode if root and mode is not None else stat.S_IMODE(info.st_mode)
-        uid = int(getattr(info, "st_uid", 0)) if archive else 0
-        gid = int(getattr(info, "st_gid", 0)) if archive else 0
+        uid = int(getattr(info, "st_uid", 0)) if archive else None
+        gid = int(getattr(info, "st_gid", 0)) if archive else None
         entries.append(
             _UploadEntry(
                 source=local_path,
@@ -131,9 +131,9 @@ def _request(entry: _UploadEntry) -> str:
         "is_dir": entry.is_dir,
         "mode": entry.mode,
     }
-    if entry.uid:
+    if entry.uid is not None:
         payload["uid"] = entry.uid
-    if entry.gid:
+    if entry.gid is not None:
         payload["gid"] = entry.gid
     return json.dumps(payload, separators=(",", ":"))
 
@@ -318,6 +318,7 @@ class _DownloadState:
         self.file: BinaryIO | None = None
         self.temp_path: Path | None = None
         self.bytes_received = 0
+        self.directories: list[_DownloadHeader] = []
         self.complete = False
 
     def abort(self) -> None:
@@ -405,8 +406,7 @@ class _DownloadState:
             if target.is_symlink() or (target.exists() and not target.is_dir()):
                 raise CopyProtocolError(f"cp cannot replace local path with directory: {target}")
             target.mkdir(parents=True, exist_ok=True)
-            target.chmod(header.mode)
-            self._chown(target, header, follow_symlinks=True)
+            self.directories.append(header)
         elif header.is_symlink:
             self._create_symlink(header)
         else:
@@ -474,6 +474,11 @@ class _DownloadState:
         self.header = None
         self.bytes_received = 0
         if final:
+            for directory in reversed(self.directories):
+                if directory.mtime:
+                    os.utime(directory.target, (directory.mtime, directory.mtime))
+                self._chown(directory.target, directory, follow_symlinks=True)
+                directory.target.chmod(directory.mode)
             self.complete = True
 
     def _chown(self, path: Path, header: _DownloadHeader, *, follow_symlinks: bool) -> None:
