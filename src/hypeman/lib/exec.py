@@ -7,6 +7,7 @@ from collections.abc import Mapping, Iterable, AsyncIterable
 from typing_extensions import TypeAlias
 
 from ._ws import (
+    MAX_INBOUND_MESSAGE_SIZE,
     ClientConfig,
     SyncWebSocketConnector,
     AsyncWebSocketConnector,
@@ -53,6 +54,7 @@ class _ExecRequest:
     wait_for_agent: int | None
     rows: int | None
     cols: int | None
+    resize: tuple[tuple[int, int], ...]
 
     def encode(self) -> str:
         payload: dict[str, object] = {"command": self.command, "tty": self.tty}
@@ -79,6 +81,7 @@ def _request(
     tty: bool,
     rows: int | None,
     cols: int | None,
+    resize: Iterable[tuple[int, int]],
 ) -> _ExecRequest:
     if isinstance(command, str):
         raise ValueError("command must be an argument sequence, not a string")
@@ -93,7 +96,13 @@ def _request(
             raise ValueError(f"{name} must be positive")
     if (rows is not None or cols is not None) and not tty:
         raise ValueError("rows and cols require tty=True")
-    return _ExecRequest(argv, tty, env, cwd, timeout, wait_for_agent, rows, cols)
+    resize_events = tuple(resize)
+    for resize_rows, resize_cols in resize_events:
+        if any(isinstance(value, bool) or value <= 0 for value in (resize_rows, resize_cols)):
+            raise ValueError("resize dimensions must be positive integers")
+    if resize_events and not tty:
+        raise ValueError("resize requires tty=True")
+    return _ExecRequest(argv, tty, env, cwd, timeout, wait_for_agent, rows, cols, resize_events)
 
 
 def _stdin_chunks(stdin: Stdin | None) -> Iterable[bytes]:
@@ -161,17 +170,16 @@ def exec(
         tty=tty,
         rows=rows,
         cols=cols,
+        resize=resize,
     )
     url, headers = connection_settings(client, instance_id, "exec")
     output = bytearray()
-    with connector(url, additional_headers=headers, max_size=None) as websocket:
+    with connector(url, additional_headers=headers, max_size=MAX_INBOUND_MESSAGE_SIZE) as websocket:
         websocket.send(request.encode())
         for chunk in _stdin_chunks(stdin):
             if chunk:
                 websocket.send(chunk)
-        for resize_rows, resize_cols in resize:
-            if not tty or resize_rows <= 0 or resize_cols <= 0:
-                raise ValueError("resize dimensions must be positive and require tty=True")
+        for resize_rows, resize_cols in request.resize:
             websocket.send(json.dumps({"resize": {"rows": resize_rows, "cols": resize_cols}}, separators=(",", ":")))
 
         while True:
@@ -212,10 +220,11 @@ async def exec_async(
         tty=tty,
         rows=rows,
         cols=cols,
+        resize=resize,
     )
     url, headers = connection_settings(client, instance_id, "exec")
     output = bytearray()
-    async with connector(url, additional_headers=headers, max_size=None) as websocket:
+    async with connector(url, additional_headers=headers, max_size=MAX_INBOUND_MESSAGE_SIZE) as websocket:
         await websocket.send(request.encode())
         if isinstance(stdin, AsyncIterable):
             async for chunk in stdin:
@@ -225,9 +234,7 @@ async def exec_async(
             for chunk in _stdin_chunks(stdin):
                 if chunk:
                     await websocket.send(chunk)
-        for resize_rows, resize_cols in resize:
-            if not tty or resize_rows <= 0 or resize_cols <= 0:
-                raise ValueError("resize dimensions must be positive and require tty=True")
+        for resize_rows, resize_cols in request.resize:
             await websocket.send(
                 json.dumps({"resize": {"rows": resize_rows, "cols": resize_cols}}, separators=(",", ":"))
             )

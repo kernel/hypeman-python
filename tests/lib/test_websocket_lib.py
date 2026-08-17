@@ -9,6 +9,7 @@ from dataclasses import field, dataclass
 from collections.abc import AsyncIterator
 
 import pytest
+from websockets.exceptions import PayloadTooBig
 
 from hypeman.lib import (
     CopyCallbacks,
@@ -62,9 +63,9 @@ class FakeWebSocket:
 @dataclass
 class FakeConnector:
     connections: deque[FakeWebSocket]
-    calls: list[tuple[str, dict[str, str], int | None]] = field(default_factory=lambda: [])
+    calls: list[tuple[str, dict[str, str], int]] = field(default_factory=lambda: [])
 
-    def __call__(self, url: str, *, additional_headers: dict[str, str], max_size: int | None) -> FakeWebSocket:
+    def __call__(self, url: str, *, additional_headers: dict[str, str], max_size: int) -> FakeWebSocket:
         self.calls.append((url, additional_headers, max_size))
         return self.connections.popleft()
 
@@ -102,9 +103,9 @@ class FakeAsyncWebSocket:
 @dataclass
 class FakeAsyncConnector:
     connections: deque[FakeAsyncWebSocket]
-    calls: list[tuple[str, dict[str, str], int | None]] = field(default_factory=lambda: [])
+    calls: list[tuple[str, dict[str, str], int]] = field(default_factory=lambda: [])
 
-    def __call__(self, url: str, *, additional_headers: dict[str, str], max_size: int | None) -> FakeAsyncWebSocket:
+    def __call__(self, url: str, *, additional_headers: dict[str, str], max_size: int) -> FakeAsyncWebSocket:
         self.calls.append((url, additional_headers, max_size))
         return self.connections.popleft()
 
@@ -155,7 +156,7 @@ def test_exec_uses_client_auth_url_and_all_request_dimensions() -> None:
     assert result.output == b"outerr"
     assert result.exit_code == 0
     assert connector.calls == [
-        ("wss://example.test/api/instances/inst_123/exec", {"Authorization": "Bearer secret"}, None)
+        ("wss://example.test/api/instances/inst_123/exec", {"Authorization": "Bearer secret"}, 2**20)
     ]
     assert json.loads(str(websocket.sent[0])) == {
         "command": ["sh", "-lc", "echo hi"],
@@ -194,6 +195,31 @@ def test_exec_never_retries_after_dispatch() -> None:
         exec(FakeClient(), "inst", ["do-once"], connector=connector)
     assert len(connector.calls) == 1
     assert len(websocket.sent) == 1
+
+
+@pytest.mark.parametrize(("tty", "resize"), [(False, [(24, 80)]), (True, [(0, 80)]), (True, [(24, -1)])])
+def test_exec_rejects_invalid_resize_before_connect(tty: bool, resize: list[tuple[int, int]]) -> None:
+    connector = FakeConnector(deque())
+    with pytest.raises(ValueError, match="resize"):
+        exec(FakeClient(), "inst", ["true"], tty=tty, resize=resize, connector=connector)
+    assert not connector.calls
+
+
+def test_exec_rejects_oversized_inbound_message() -> None:
+    oversized = PayloadTooBig(2**20 + 1, 2**20)
+    connector = FakeConnector(deque([FakeWebSocket(deque([oversized]))]))
+    with pytest.raises(ExecProtocolError, match="before an exitCode") as exc_info:
+        exec(FakeClient(), "inst", ["true"], connector=connector)
+    assert isinstance(exc_info.value.__cause__, PayloadTooBig)
+    assert connector.calls[0][2] == 2**20
+
+
+@pytest.mark.asyncio
+async def test_exec_async_rejects_invalid_resize_before_connect() -> None:
+    connector = FakeAsyncConnector(deque())
+    with pytest.raises(ValueError, match="resize"):
+        await exec_async(FakeClient(), "inst", ["true"], tty=False, resize=[(24, 80)], connector=connector)
+    assert not connector.calls
 
 
 @pytest.mark.asyncio
@@ -248,6 +274,7 @@ def test_cp_upload_file_preserves_mode_and_reports_progress(tmp_path: Path) -> N
         expected_request["gid"] = source_stat.st_gid
     assert request == expected_request
     assert websocket.sent[1:] == [b"payload", '{"type":"end"}']
+    assert connector.calls[0][2] == 2**20
     assert events == [
         ("start", (str(source), 7)),
         ("progress", 7),
@@ -420,27 +447,31 @@ async def test_cp_async_upload_and_download(tmp_path: Path) -> None:
     source = tmp_path / "source"
     source.write_bytes(b"async")
     upload_socket = FakeAsyncWebSocket(deque([upload_result(5)]))
+    upload_connector = FakeAsyncConnector(deque([upload_socket]))
     await cp_to_instance_async(
         FakeClient(),
         "inst",
         source,
         "/guest/source",
-        connector=FakeAsyncConnector(deque([upload_socket])),
+        connector=upload_connector,
     )
     assert upload_socket.sent[1] == b"async"
+    assert upload_connector.calls[0][2] == 2**20
 
     download_socket = FakeAsyncWebSocket(
         deque([file_header("result", size=5), b"async", text_frame({"type": "end", "final": True})])
     )
     destination = tmp_path / "dest"
+    download_connector = FakeAsyncConnector(deque([download_socket]))
     await cp_from_instance_async(
         FakeClient(),
         "inst",
         "/guest/result",
         destination,
-        connector=FakeAsyncConnector(deque([download_socket])),
+        connector=download_connector,
     )
     assert (destination / "result").read_bytes() == b"async"
+    assert download_connector.calls[0][2] == 2**20
 
 
 def test_invalid_instance_id_is_rejected_before_connect() -> None:

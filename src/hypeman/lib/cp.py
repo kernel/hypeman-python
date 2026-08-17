@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from collections.abc import Callable
 
 from ._ws import (
+    MAX_INBOUND_MESSAGE_SIZE,
     ClientConfig,
     SyncWebSocket,
     AsyncWebSocket,
@@ -220,7 +221,7 @@ def cp_to_instance(
     )
     url, headers = connection_settings(client, instance_id, "cp")
     for entry in entries:
-        with connector(url, additional_headers=headers, max_size=None) as websocket:
+        with connector(url, additional_headers=headers, max_size=MAX_INBOUND_MESSAGE_SIZE) as websocket:
             websocket.send(_request(entry))
             if entry.is_dir:
                 websocket.send('{"type":"end"}')
@@ -280,7 +281,7 @@ async def cp_to_instance_async(
     )
     url, headers = connection_settings(client, instance_id, "cp")
     for entry in entries:
-        async with connector(url, additional_headers=headers, max_size=None) as websocket:
+        async with connector(url, additional_headers=headers, max_size=MAX_INBOUND_MESSAGE_SIZE) as websocket:
             await websocket.send(_request(entry))
             if entry.is_dir:
                 await websocket.send('{"type":"end"}')
@@ -507,7 +508,7 @@ def cp_from_instance(
     url, headers = connection_settings(client, instance_id, "cp")
     state = _DownloadState(Path(dst_path), archive, callbacks)
     try:
-        with connector(url, additional_headers=headers, max_size=None) as websocket:
+        with connector(url, additional_headers=headers, max_size=MAX_INBOUND_MESSAGE_SIZE) as websocket:
             websocket.send(_download_request(src_path, follow_symlinks))
             while not state.complete:
                 try:
@@ -536,7 +537,7 @@ async def cp_from_instance_async(
     url, headers = connection_settings(client, instance_id, "cp")
     state = _DownloadState(Path(dst_path), archive, callbacks)
     try:
-        async with connector(url, additional_headers=headers, max_size=None) as websocket:
+        async with connector(url, additional_headers=headers, max_size=MAX_INBOUND_MESSAGE_SIZE) as websocket:
             await websocket.send(_download_request(src_path, follow_symlinks))
             while not state.complete:
                 try:

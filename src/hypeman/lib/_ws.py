@@ -16,6 +16,9 @@ __all__ = [
 ]
 
 
+MAX_INBOUND_MESSAGE_SIZE = 2**20
+
+
 class ClientConfig(Protocol):
     """The generated client settings used by the custom WebSocket APIs."""
 
@@ -46,7 +49,7 @@ _SyncWebSocketT = TypeVar("_SyncWebSocketT", bound=SyncWebSocket)
 
 
 class SyncWebSocketConnector(Protocol):
-    def __call__(self, url: str, *, additional_headers: dict[str, str], max_size: int | None) -> SyncWebSocket: ...
+    def __call__(self, url: str, *, additional_headers: dict[str, str], max_size: int) -> SyncWebSocket: ...
 
 
 class AsyncWebSocket(Protocol):
@@ -81,16 +84,24 @@ class AsyncWebSocketContext(Protocol):
 
 
 class AsyncWebSocketConnector(Protocol):
-    def __call__(
-        self, url: str, *, additional_headers: dict[str, str], max_size: int | None
-    ) -> AsyncWebSocketContext: ...
+    def __call__(self, url: str, *, additional_headers: dict[str, str], max_size: int) -> AsyncWebSocketContext: ...
 
 
-def sync_connect(url: str, *, additional_headers: dict[str, str], max_size: int | None) -> SyncWebSocket:
+def sync_connect(
+    url: str,
+    *,
+    additional_headers: dict[str, str],
+    max_size: int = MAX_INBOUND_MESSAGE_SIZE,
+) -> SyncWebSocket:
     return cast(SyncWebSocket, websocket_connect(url, additional_headers=additional_headers, max_size=max_size))
 
 
-def async_connect(url: str, *, additional_headers: dict[str, str], max_size: int | None) -> AsyncWebSocketContext:
+def async_connect(
+    url: str,
+    *,
+    additional_headers: dict[str, str],
+    max_size: int = MAX_INBOUND_MESSAGE_SIZE,
+) -> AsyncWebSocketContext:
     return cast(
         AsyncWebSocketContext,
         async_websocket_connect(url, additional_headers=additional_headers, max_size=max_size),
