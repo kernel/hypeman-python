@@ -12,6 +12,12 @@ jobs:
   publish:
     name: publish
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/hypeman
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -24,8 +30,8 @@ jobs:
           RYE_VERSION: '0.44.0'
           RYE_INSTALL_OPTION: '--yes'
 
+      - name: Build distributions
+        run: rye build --clean
+
       - name: Publish to PyPI
-        run: |
-          bash ./bin/publish-pypi
-        env:
-          PYPI_TOKEN: ${{ secrets.HYPEMAN_PYPI_TOKEN || secrets.PYPI_TOKEN }}
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
