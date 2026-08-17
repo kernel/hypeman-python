@@ -19,6 +19,7 @@ from .device_type import DeviceType as DeviceType
 from .gpu_profile import GPUProfile as GPUProfile
 from .push_status import PushStatus as PushStatus
 from .build_status import BuildStatus as BuildStatus
+from .capabilities import Capabilities as Capabilities
 from .health_check import HealthCheck as HealthCheck
 from .ingress_rule import IngressRule as IngressRule
 from .volume_mount import VolumeMount as VolumeMount
@@ -36,6 +37,7 @@ from .available_device import AvailableDevice as AvailableDevice
 from .build_provenance import BuildProvenance as BuildProvenance
 from .health_check_tcp import HealthCheckTcp as HealthCheckTcp
 from .build_list_params import BuildListParams as BuildListParams
+from .capabilities_host import CapabilitiesHost as CapabilitiesHost
 from .health_check_exec import HealthCheckExec as HealthCheckExec
 from .health_check_http import HealthCheckHTTP as HealthCheckHTTP
 from .image_list_params import ImageListParams as ImageListParams
@@ -55,12 +57,16 @@ from .build_create_params import BuildCreateParams as BuildCreateParams
 from .build_events_params import BuildEventsParams as BuildEventsParams
 from .build_list_response import BuildListResponse as BuildListResponse
 from .builder_list_params import BuilderListParams as BuilderListParams
+from .capabilities_images import CapabilitiesImages as CapabilitiesImages
+from .capabilities_server import CapabilitiesServer as CapabilitiesServer
 from .gpu_resource_status import GPUResourceStatus as GPUResourceStatus
 from .image_create_params import ImageCreateParams as ImageCreateParams
 from .image_list_response import ImageListResponse as ImageListResponse
 from .ingress_list_params import IngressListParams as IngressListParams
 from .ingress_match_param import IngressMatchParam as IngressMatchParam
 from .resource_allocation import ResourceAllocation as ResourceAllocation
+from .capabilities_network import CapabilitiesNetwork as CapabilitiesNetwork
+from .capabilities_runtime import CapabilitiesRuntime as CapabilitiesRuntime
 from .device_create_params import DeviceCreateParams as DeviceCreateParams
 from .device_list_response import DeviceListResponse as DeviceListResponse
 from .ingress_target_param import IngressTargetParam as IngressTargetParam
@@ -97,6 +103,7 @@ from .memory_reclaim_response import MemoryReclaimResponse as MemoryReclaimRespo
 from .wait_for_state_response import WaitForStateResponse as WaitForStateResponse
 from .auto_standby_policy_param import AutoStandbyPolicyParam as AutoStandbyPolicyParam
 from .snapshot_schedule_retention import SnapshotScheduleRetention as SnapshotScheduleRetention
+from .capabilities_default_runtime import CapabilitiesDefaultRuntime as CapabilitiesDefaultRuntime
 from .device_list_available_response import DeviceListAvailableResponse as DeviceListAvailableResponse
 from .resource_reclaim_memory_params import ResourceReclaimMemoryParams as ResourceReclaimMemoryParams
 from .snapshot_schedule_retention_param import SnapshotScheduleRetentionParam as SnapshotScheduleRetentionParam

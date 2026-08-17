@@ -47,6 +47,7 @@ if TYPE_CHECKING:
         instances,
         resources,
         snapshots,
+        capabilities,
     )
     from .resources.builds import BuildsResource, AsyncBuildsResource
     from .resources.health import HealthResource, AsyncHealthResource
@@ -58,6 +59,7 @@ if TYPE_CHECKING:
     from .resources.ingresses import IngressesResource, AsyncIngressesResource
     from .resources.resources import ResourcesResource, AsyncResourcesResource
     from .resources.snapshots import SnapshotsResource, AsyncSnapshotsResource
+    from .resources.capabilities import CapabilitiesResource, AsyncCapabilitiesResource
     from .resources.instances.instances import InstancesResource, AsyncInstancesResource
 
 __all__ = ["Timeout", "Transport", "ProxiesTypes", "RequestOptions", "Hypeman", "AsyncHypeman", "Client", "AsyncClient"]
@@ -132,6 +134,12 @@ class Hypeman(SyncAPIClient):
         from .resources.health import HealthResource
 
         return HealthResource(self)
+
+    @cached_property
+    def capabilities(self) -> CapabilitiesResource:
+        from .resources.capabilities import CapabilitiesResource
+
+        return CapabilitiesResource(self)
 
     @cached_property
     def images(self) -> ImagesResource:
@@ -377,6 +385,12 @@ class AsyncHypeman(AsyncAPIClient):
         return AsyncHealthResource(self)
 
     @cached_property
+    def capabilities(self) -> AsyncCapabilitiesResource:
+        from .resources.capabilities import AsyncCapabilitiesResource
+
+        return AsyncCapabilitiesResource(self)
+
+    @cached_property
     def images(self) -> AsyncImagesResource:
         from .resources.images import AsyncImagesResource
 
@@ -562,6 +576,12 @@ class HypemanWithRawResponse:
         return HealthResourceWithRawResponse(self._client.health)
 
     @cached_property
+    def capabilities(self) -> capabilities.CapabilitiesResourceWithRawResponse:
+        from .resources.capabilities import CapabilitiesResourceWithRawResponse
+
+        return CapabilitiesResourceWithRawResponse(self._client.capabilities)
+
+    @cached_property
     def images(self) -> images.ImagesResourceWithRawResponse:
         from .resources.images import ImagesResourceWithRawResponse
 
@@ -633,6 +653,12 @@ class AsyncHypemanWithRawResponse:
         from .resources.health import AsyncHealthResourceWithRawResponse
 
         return AsyncHealthResourceWithRawResponse(self._client.health)
+
+    @cached_property
+    def capabilities(self) -> capabilities.AsyncCapabilitiesResourceWithRawResponse:
+        from .resources.capabilities import AsyncCapabilitiesResourceWithRawResponse
+
+        return AsyncCapabilitiesResourceWithRawResponse(self._client.capabilities)
 
     @cached_property
     def images(self) -> images.AsyncImagesResourceWithRawResponse:
@@ -708,6 +734,12 @@ class HypemanWithStreamedResponse:
         return HealthResourceWithStreamingResponse(self._client.health)
 
     @cached_property
+    def capabilities(self) -> capabilities.CapabilitiesResourceWithStreamingResponse:
+        from .resources.capabilities import CapabilitiesResourceWithStreamingResponse
+
+        return CapabilitiesResourceWithStreamingResponse(self._client.capabilities)
+
+    @cached_property
     def images(self) -> images.ImagesResourceWithStreamingResponse:
         from .resources.images import ImagesResourceWithStreamingResponse
 
@@ -779,6 +811,12 @@ class AsyncHypemanWithStreamedResponse:
         from .resources.health import AsyncHealthResourceWithStreamingResponse
 
         return AsyncHealthResourceWithStreamingResponse(self._client.health)
+
+    @cached_property
+    def capabilities(self) -> capabilities.AsyncCapabilitiesResourceWithStreamingResponse:
+        from .resources.capabilities import AsyncCapabilitiesResourceWithStreamingResponse
+
+        return AsyncCapabilitiesResourceWithStreamingResponse(self._client.capabilities)
 
     @cached_property
     def images(self) -> images.AsyncImagesResourceWithStreamingResponse:

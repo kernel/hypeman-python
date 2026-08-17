@@ -88,6 +88,14 @@ from .snapshots import (
     SnapshotsResourceWithStreamingResponse,
     AsyncSnapshotsResourceWithStreamingResponse,
 )
+from .capabilities import (
+    CapabilitiesResource,
+    AsyncCapabilitiesResource,
+    CapabilitiesResourceWithRawResponse,
+    AsyncCapabilitiesResourceWithRawResponse,
+    CapabilitiesResourceWithStreamingResponse,
+    AsyncCapabilitiesResourceWithStreamingResponse,
+)
 
 __all__ = [
     "HealthResource",
@@ -96,6 +104,12 @@ __all__ = [
     "AsyncHealthResourceWithRawResponse",
     "HealthResourceWithStreamingResponse",
     "AsyncHealthResourceWithStreamingResponse",
+    "CapabilitiesResource",
+    "AsyncCapabilitiesResource",
+    "CapabilitiesResourceWithRawResponse",
+    "AsyncCapabilitiesResourceWithRawResponse",
+    "CapabilitiesResourceWithStreamingResponse",
+    "AsyncCapabilitiesResourceWithStreamingResponse",
     "ImagesResource",
     "AsyncImagesResource",
     "ImagesResourceWithRawResponse",
