@@ -22,6 +22,7 @@ from hypeman.lib import (
     cp_to_instance_async,
     cp_from_instance_async,
 )
+from hypeman.lib.cp import _request, _UploadEntry
 
 
 @dataclass
@@ -268,10 +269,8 @@ def test_cp_upload_file_preserves_mode_and_reports_progress(tmp_path: Path) -> N
         "mode": 0o640,
     }
     source_stat = source.stat()
-    if source_stat.st_uid:
-        expected_request["uid"] = source_stat.st_uid
-    if source_stat.st_gid:
-        expected_request["gid"] = source_stat.st_gid
+    expected_request["uid"] = source_stat.st_uid
+    expected_request["gid"] = source_stat.st_gid
     assert request == expected_request
     assert websocket.sent[1:] == [b"payload", '{"type":"end"}']
     assert connector.calls[0][2] == 2**20
@@ -280,6 +279,13 @@ def test_cp_upload_file_preserves_mode_and_reports_progress(tmp_path: Path) -> N
         ("progress", 7),
         ("end", str(source)),
     ]
+
+
+def test_cp_upload_archive_includes_root_ownership(tmp_path: Path) -> None:
+    entry = _UploadEntry(tmp_path, "/guest/file", False, 0o644, 0, 0, 0)
+
+    assert json.loads(_request(entry))["uid"] == 0
+    assert json.loads(_request(entry))["gid"] == 0
 
 
 def test_cp_upload_directory_uses_one_connection_per_entry(tmp_path: Path) -> None:
@@ -355,6 +361,44 @@ def test_cp_download_file_is_atomic_and_preserves_metadata(tmp_path: Path) -> No
         "guest_path": "/guest/output.txt",
         "follow_links": False,
     }
+
+
+def test_cp_download_defers_restrictive_directory_mode(tmp_path: Path) -> None:
+    directory = text_frame(
+        {
+            "type": "header",
+            "path": "tree",
+            "mode": 0o500,
+            "is_dir": True,
+            "is_symlink": False,
+            "link_target": "",
+            "size": 0,
+            "mtime": 0,
+        }
+    )
+    websocket = FakeWebSocket(
+        deque(
+            [
+                directory,
+                text_frame({"type": "end", "final": False}),
+                file_header("tree/child.txt", size=1),
+                b"x",
+                text_frame({"type": "end", "final": True}),
+            ]
+        )
+    )
+    destination = tmp_path / "download"
+
+    cp_from_instance(
+        FakeClient(),
+        "inst",
+        "/guest/tree",
+        destination,
+        connector=FakeConnector(deque([websocket])),
+    )
+
+    assert (destination / "tree" / "child.txt").read_bytes() == b"x"
+    assert stat_mode(destination / "tree") == 0o500
 
 
 def stat_mode(path: Path) -> int:

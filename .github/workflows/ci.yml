@@ -37,6 +37,9 @@ jobs:
       - name: Run lints
         run: ./scripts/lint
 
+      - name: Run tests
+        run: ./scripts/test
+
   build:
     if: (github.event_name == 'push' || github.event.pull_request.head.repo.fork) && (github.event_name != 'push' || github.event.head_commit.message != 'codegen metadata')
     timeout-minutes: 10
