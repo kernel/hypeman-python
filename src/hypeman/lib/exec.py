@@ -80,6 +80,8 @@ def _request(
     rows: int | None,
     cols: int | None,
 ) -> _ExecRequest:
+    if isinstance(command, str):
+        raise ValueError("command must be an argument sequence, not a string")
     argv = list(command)
     if not argv:
         raise ValueError("command must contain at least one string argument")
@@ -145,7 +147,9 @@ def exec(
     """Execute a command and collect its merged stdout/stderr bytes.
 
     The request is dispatched once and is never retried. ``stdin`` is sent as binary
-    WebSocket frames. TTY resize tuples are ``(rows, cols)``.
+    WebSocket frames. The protocol has no stdin EOF frame, so commands must stop
+    reading based on their input, another condition, or ``timeout``. TTY resize
+    tuples are ``(rows, cols)``.
     """
 
     request = _request(
