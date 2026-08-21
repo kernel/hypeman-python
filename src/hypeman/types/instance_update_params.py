@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Dict
-from typing_extensions import TypedDict
+from typing import Dict, Union
+from datetime import datetime
+from typing_extensions import Annotated, TypedDict
 
+from .._utils import PropertyInfo
 from .health_check_param import HealthCheckParam
 from .restart_policy_param import RestartPolicyParam
 from .auto_standby_policy_param import AutoStandbyPolicyParam
@@ -26,6 +28,12 @@ class InstanceUpdateParams(TypedDict, total=False):
     to rotate real credential values without restarting the VM.
     """
 
+    expires_at: Annotated[Union[str, datetime], PropertyInfo(format="iso8601")]
+    """Absolute expiration time.
+
+    Must be in the future and is mutually exclusive with ttl.
+    """
+
     health_check: HealthCheckParam
     """Workload health check policy.
 
@@ -34,3 +42,9 @@ class InstanceUpdateParams(TypedDict, total=False):
 
     restart_policy: RestartPolicyParam
     """Whole-instance restart supervision policy."""
+
+    ttl: str
+    """Relative lifetime from when this update is committed, in Go duration format.
+
+    Use "0s" to disable automatic expiration. Mutually exclusive with expires_at.
+    """

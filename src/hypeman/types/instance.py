@@ -55,6 +55,12 @@ class Instance(BaseModel):
     created_at: datetime
     """Creation timestamp (RFC3339)"""
 
+    expires_at: Optional[datetime] = None
+    """Absolute expiration time, or null when automatic expiration is disabled.
+
+    Instance TTL is cleared on fork.
+    """
+
     image: str
     """OCI image reference"""
 

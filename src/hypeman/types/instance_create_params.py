@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Dict, Iterable
-from typing_extensions import Literal, Required, TypedDict
+from typing import Dict, Union, Iterable
+from datetime import datetime
+from typing_extensions import Literal, Required, Annotated, TypedDict
 
 from .._types import SequenceNotStr
+from .._utils import PropertyInfo
 from .health_check_param import HealthCheckParam
 from .volume_mount_param import VolumeMountParam
 from .restart_policy_param import RestartPolicyParam
@@ -72,6 +74,12 @@ class InstanceCreateParams(TypedDict, total=False):
 
     env: Dict[str, str]
     """Environment variables"""
+
+    expires_at: Annotated[Union[str, datetime], PropertyInfo(format="iso8601")]
+    """Absolute expiration time.
+
+    Must be in the future and is mutually exclusive with ttl.
+    """
 
     gpu: GPU
     """GPU configuration for the instance"""
@@ -141,6 +149,13 @@ class InstanceCreateParams(TypedDict, total=False):
 
     tags: Dict[str, str]
     """User-defined key-value tags."""
+
+    ttl: str
+    """Relative lifetime from instance creation, in Go duration format.
+
+    Use "0s" or omit both expiration fields to disable automatic expiration.
+    Mutually exclusive with expires_at.
+    """
 
     vcpus: int
     """Number of virtual CPUs"""
