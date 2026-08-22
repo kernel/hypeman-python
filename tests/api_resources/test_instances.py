@@ -16,6 +16,7 @@ from hypeman.types import (
     InstanceListResponse,
     WaitForStateResponse,
 )
+from hypeman._utils import parse_datetime
 
 base_url = os.environ.get("TEST_API_BASE_URL", "http://127.0.0.1:4010")
 
@@ -66,6 +67,7 @@ class TestInstances:
                 "PORT": "3000",
                 "NODE_ENV": "production",
             },
+            expires_at=parse_datetime("2026-08-21T18:00:00Z"),
             gpu={"profile": "L40S-1Q"},
             health_check={
                 "exec": {
@@ -120,6 +122,7 @@ class TestInstances:
                 "team": "backend",
                 "env": "staging",
             },
+            ttl="24h",
             vcpus=2,
             volumes=[
                 {
@@ -181,6 +184,7 @@ class TestInstances:
                 "ignore_source_cidrs": ["10.0.0.0/8", "192.168.0.0/16"],
             },
             env={"OUTBOUND_OPENAI_KEY": "new-rotated-key-456"},
+            expires_at=parse_datetime("2026-08-21T18:00:00Z"),
             health_check={
                 "exec": {
                     "command": ["curl", "-f", "http://localhost:4318/"],
@@ -206,6 +210,7 @@ class TestInstances:
                 "policy": "on_failure",
                 "stable_after": "10m",
             },
+            ttl="6h",
         )
         assert_matches_type(Instance, instance, path=["response"])
 
@@ -871,6 +876,7 @@ class TestAsyncInstances:
                 "PORT": "3000",
                 "NODE_ENV": "production",
             },
+            expires_at=parse_datetime("2026-08-21T18:00:00Z"),
             gpu={"profile": "L40S-1Q"},
             health_check={
                 "exec": {
@@ -925,6 +931,7 @@ class TestAsyncInstances:
                 "team": "backend",
                 "env": "staging",
             },
+            ttl="24h",
             vcpus=2,
             volumes=[
                 {
@@ -986,6 +993,7 @@ class TestAsyncInstances:
                 "ignore_source_cidrs": ["10.0.0.0/8", "192.168.0.0/16"],
             },
             env={"OUTBOUND_OPENAI_KEY": "new-rotated-key-456"},
+            expires_at=parse_datetime("2026-08-21T18:00:00Z"),
             health_check={
                 "exec": {
                     "command": ["curl", "-f", "http://localhost:4318/"],
@@ -1011,6 +1019,7 @@ class TestAsyncInstances:
                 "policy": "on_failure",
                 "stable_after": "10m",
             },
+            ttl="6h",
         )
         assert_matches_type(Instance, instance, path=["response"])
 

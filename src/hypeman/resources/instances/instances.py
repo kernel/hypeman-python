@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Dict, Iterable
+from typing import Dict, Union, Iterable
+from datetime import datetime
 from typing_extensions import Literal
 
 import httpx
@@ -126,6 +127,7 @@ class InstancesResource(SyncAPIResource):
         disk_io_bps: str | Omit = omit,
         entrypoint: SequenceNotStr[str] | Omit = omit,
         env: Dict[str, str] | Omit = omit,
+        expires_at: Union[str, datetime] | Omit = omit,
         gpu: instance_create_params.GPU | Omit = omit,
         health_check: HealthCheckParam | Omit = omit,
         hotplug_size: str | Omit = omit,
@@ -139,6 +141,7 @@ class InstancesResource(SyncAPIResource):
         skip_kernel_headers: bool | Omit = omit,
         snapshot_policy: SnapshotPolicyParam | Omit = omit,
         tags: Dict[str, str] | Omit = omit,
+        ttl: str | Omit = omit,
         vcpus: int | Omit = omit,
         volumes: Iterable[VolumeMountParam] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -177,6 +180,9 @@ class InstancesResource(SyncAPIResource):
               default.
 
           env: Environment variables
+
+          expires_at: Absolute expiration time. Must be in the future and is mutually exclusive with
+              ttl.
 
           gpu: GPU configuration for the instance
 
@@ -219,6 +225,10 @@ class InstancesResource(SyncAPIResource):
 
           tags: User-defined key-value tags.
 
+          ttl: Relative lifetime from instance creation, in Go duration format. Use "0s" or
+              omit both expiration fields to disable automatic expiration. Mutually exclusive
+              with expires_at.
+
           vcpus: Number of virtual CPUs
 
           volumes: Volumes to attach to the instance at creation time
@@ -244,6 +254,7 @@ class InstancesResource(SyncAPIResource):
                     "disk_io_bps": disk_io_bps,
                     "entrypoint": entrypoint,
                     "env": env,
+                    "expires_at": expires_at,
                     "gpu": gpu,
                     "health_check": health_check,
                     "hotplug_size": hotplug_size,
@@ -257,6 +268,7 @@ class InstancesResource(SyncAPIResource):
                     "skip_kernel_headers": skip_kernel_headers,
                     "snapshot_policy": snapshot_policy,
                     "tags": tags,
+                    "ttl": ttl,
                     "vcpus": vcpus,
                     "volumes": volumes,
                 },
@@ -274,8 +286,10 @@ class InstancesResource(SyncAPIResource):
         *,
         auto_standby: AutoStandbyPolicyParam | Omit = omit,
         env: Dict[str, str] | Omit = omit,
+        expires_at: Union[str, datetime] | Omit = omit,
         health_check: HealthCheckParam | Omit = omit,
         restart_policy: RestartPolicyParam | Omit = omit,
+        ttl: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -283,11 +297,10 @@ class InstancesResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Instance:
-        """Update mutable properties of a running instance.
+        """Update mutable instance properties.
 
-        Currently supports updating
-        only the environment variables referenced by existing credential policies,
-        enabling secret/key rotation without instance restart.
+        TTL values are relative to when the update
+        is committed. Expiration updates are rejected after the current deadline passes.
 
         Args:
           auto_standby: Linux-only automatic standby policy based on active inbound TCP connections
@@ -297,10 +310,16 @@ class InstancesResource(SyncAPIResource):
               the instance's existing credential `source.env` bindings are accepted. Use this
               to rotate real credential values without restarting the VM.
 
+          expires_at: Absolute expiration time. Must be in the future and is mutually exclusive with
+              ttl.
+
           health_check: Workload health check policy. Health is reported separately from instance
               lifecycle state.
 
           restart_policy: Whole-instance restart supervision policy.
+
+          ttl: Relative lifetime from when this update is committed, in Go duration format. Use
+              "0s" to disable automatic expiration. Mutually exclusive with expires_at.
 
           extra_headers: Send extra headers
 
@@ -318,8 +337,10 @@ class InstancesResource(SyncAPIResource):
                 {
                     "auto_standby": auto_standby,
                     "env": env,
+                    "expires_at": expires_at,
                     "health_check": health_check,
                     "restart_policy": restart_policy,
+                    "ttl": ttl,
                 },
                 instance_update_params.InstanceUpdateParams,
             ),
@@ -919,6 +940,7 @@ class AsyncInstancesResource(AsyncAPIResource):
         disk_io_bps: str | Omit = omit,
         entrypoint: SequenceNotStr[str] | Omit = omit,
         env: Dict[str, str] | Omit = omit,
+        expires_at: Union[str, datetime] | Omit = omit,
         gpu: instance_create_params.GPU | Omit = omit,
         health_check: HealthCheckParam | Omit = omit,
         hotplug_size: str | Omit = omit,
@@ -932,6 +954,7 @@ class AsyncInstancesResource(AsyncAPIResource):
         skip_kernel_headers: bool | Omit = omit,
         snapshot_policy: SnapshotPolicyParam | Omit = omit,
         tags: Dict[str, str] | Omit = omit,
+        ttl: str | Omit = omit,
         vcpus: int | Omit = omit,
         volumes: Iterable[VolumeMountParam] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -970,6 +993,9 @@ class AsyncInstancesResource(AsyncAPIResource):
               default.
 
           env: Environment variables
+
+          expires_at: Absolute expiration time. Must be in the future and is mutually exclusive with
+              ttl.
 
           gpu: GPU configuration for the instance
 
@@ -1012,6 +1038,10 @@ class AsyncInstancesResource(AsyncAPIResource):
 
           tags: User-defined key-value tags.
 
+          ttl: Relative lifetime from instance creation, in Go duration format. Use "0s" or
+              omit both expiration fields to disable automatic expiration. Mutually exclusive
+              with expires_at.
+
           vcpus: Number of virtual CPUs
 
           volumes: Volumes to attach to the instance at creation time
@@ -1037,6 +1067,7 @@ class AsyncInstancesResource(AsyncAPIResource):
                     "disk_io_bps": disk_io_bps,
                     "entrypoint": entrypoint,
                     "env": env,
+                    "expires_at": expires_at,
                     "gpu": gpu,
                     "health_check": health_check,
                     "hotplug_size": hotplug_size,
@@ -1050,6 +1081,7 @@ class AsyncInstancesResource(AsyncAPIResource):
                     "skip_kernel_headers": skip_kernel_headers,
                     "snapshot_policy": snapshot_policy,
                     "tags": tags,
+                    "ttl": ttl,
                     "vcpus": vcpus,
                     "volumes": volumes,
                 },
@@ -1067,8 +1099,10 @@ class AsyncInstancesResource(AsyncAPIResource):
         *,
         auto_standby: AutoStandbyPolicyParam | Omit = omit,
         env: Dict[str, str] | Omit = omit,
+        expires_at: Union[str, datetime] | Omit = omit,
         health_check: HealthCheckParam | Omit = omit,
         restart_policy: RestartPolicyParam | Omit = omit,
+        ttl: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -1076,11 +1110,10 @@ class AsyncInstancesResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Instance:
-        """Update mutable properties of a running instance.
+        """Update mutable instance properties.
 
-        Currently supports updating
-        only the environment variables referenced by existing credential policies,
-        enabling secret/key rotation without instance restart.
+        TTL values are relative to when the update
+        is committed. Expiration updates are rejected after the current deadline passes.
 
         Args:
           auto_standby: Linux-only automatic standby policy based on active inbound TCP connections
@@ -1090,10 +1123,16 @@ class AsyncInstancesResource(AsyncAPIResource):
               the instance's existing credential `source.env` bindings are accepted. Use this
               to rotate real credential values without restarting the VM.
 
+          expires_at: Absolute expiration time. Must be in the future and is mutually exclusive with
+              ttl.
+
           health_check: Workload health check policy. Health is reported separately from instance
               lifecycle state.
 
           restart_policy: Whole-instance restart supervision policy.
+
+          ttl: Relative lifetime from when this update is committed, in Go duration format. Use
+              "0s" to disable automatic expiration. Mutually exclusive with expires_at.
 
           extra_headers: Send extra headers
 
@@ -1111,8 +1150,10 @@ class AsyncInstancesResource(AsyncAPIResource):
                 {
                     "auto_standby": auto_standby,
                     "env": env,
+                    "expires_at": expires_at,
                     "health_check": health_check,
                     "restart_policy": restart_policy,
+                    "ttl": ttl,
                 },
                 instance_update_params.InstanceUpdateParams,
             ),

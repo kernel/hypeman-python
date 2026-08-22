@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/kernel/hypeman-python/compare/v0.1.0...v0.2.0) (2026-08-21)
+
+
+### Features
+
+* Repair SDK tracking generation ([da303fc](https://github.com/kernel/hypeman-python/commit/da303fcc32f896bcba886a5101a82d8a6ba728cd))
+
 ## [0.1.0](https://github.com/kernel/hypeman-python/compare/v0.0.1...v0.1.0) (2026-08-17)
 
 
