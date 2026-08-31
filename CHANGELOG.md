@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.27.0](https://github.com/kernel/hypeman-python/compare/v0.2.0...v0.27.0) (2026-08-31)
+
+
+### Features
+
+* Allow skipping graceful shutdown on instance delete ([cfc7ca8](https://github.com/kernel/hypeman-python/commit/cfc7ca84d29e364889896f01c6e10cedd3ec0541))
+
+
+### Chores
+
+* align release version ([918cac7](https://github.com/kernel/hypeman-python/commit/918cac7aea641e285791de9d2377fc245b696da7))
+
 ## [0.2.0](https://github.com/kernel/hypeman-python/compare/v0.1.0...v0.2.0) (2026-08-21)
 
 
