@@ -292,7 +292,16 @@ class TestInstances:
     @parametrize
     def test_method_delete(self, client: Hypeman) -> None:
         instance = client.instances.delete(
-            "id",
+            id="id",
+        )
+        assert instance is None
+
+    @pytest.mark.skip(reason="Mock server tests are disabled")
+    @parametrize
+    def test_method_delete_with_all_params(self, client: Hypeman) -> None:
+        instance = client.instances.delete(
+            id="id",
+            graceful_shutdown=True,
         )
         assert instance is None
 
@@ -300,7 +309,7 @@ class TestInstances:
     @parametrize
     def test_raw_response_delete(self, client: Hypeman) -> None:
         response = client.instances.with_raw_response.delete(
-            "id",
+            id="id",
         )
 
         assert response.is_closed is True
@@ -312,7 +321,7 @@ class TestInstances:
     @parametrize
     def test_streaming_response_delete(self, client: Hypeman) -> None:
         with client.instances.with_streaming_response.delete(
-            "id",
+            id="id",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -327,7 +336,7 @@ class TestInstances:
     def test_path_params_delete(self, client: Hypeman) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `id` but received ''"):
             client.instances.with_raw_response.delete(
-                "",
+                id="",
             )
 
     @pytest.mark.skip(reason="Mock server tests are disabled")
@@ -1101,7 +1110,16 @@ class TestAsyncInstances:
     @parametrize
     async def test_method_delete(self, async_client: AsyncHypeman) -> None:
         instance = await async_client.instances.delete(
-            "id",
+            id="id",
+        )
+        assert instance is None
+
+    @pytest.mark.skip(reason="Mock server tests are disabled")
+    @parametrize
+    async def test_method_delete_with_all_params(self, async_client: AsyncHypeman) -> None:
+        instance = await async_client.instances.delete(
+            id="id",
+            graceful_shutdown=True,
         )
         assert instance is None
 
@@ -1109,7 +1127,7 @@ class TestAsyncInstances:
     @parametrize
     async def test_raw_response_delete(self, async_client: AsyncHypeman) -> None:
         response = await async_client.instances.with_raw_response.delete(
-            "id",
+            id="id",
         )
 
         assert response.is_closed is True
@@ -1121,7 +1139,7 @@ class TestAsyncInstances:
     @parametrize
     async def test_streaming_response_delete(self, async_client: AsyncHypeman) -> None:
         async with async_client.instances.with_streaming_response.delete(
-            "id",
+            id="id",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -1136,7 +1154,7 @@ class TestAsyncInstances:
     async def test_path_params_delete(self, async_client: AsyncHypeman) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `id` but received ''"):
             await async_client.instances.with_raw_response.delete(
-                "",
+                id="",
             )
 
     @pytest.mark.skip(reason="Mock server tests are disabled")
