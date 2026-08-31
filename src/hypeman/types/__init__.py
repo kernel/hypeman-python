@@ -90,6 +90,7 @@ from .memory_reclaim_action import MemoryReclaimAction as MemoryReclaimAction
 from .snapshot_policy_param import SnapshotPolicyParam as SnapshotPolicyParam
 from .health_check_tcp_param import HealthCheckTcpParam as HealthCheckTcpParam
 from .instance_create_params import InstanceCreateParams as InstanceCreateParams
+from .instance_delete_params import InstanceDeleteParams as InstanceDeleteParams
 from .instance_health_status import InstanceHealthStatus as InstanceHealthStatus
 from .instance_list_response import InstanceListResponse as InstanceListResponse
 from .instance_logs_response import InstanceLogsResponse as InstanceLogsResponse

@@ -16,6 +16,7 @@ from ...types import (
     instance_wait_params,
     instance_start_params,
     instance_create_params,
+    instance_delete_params,
     instance_update_params,
     instance_standby_params,
 )
@@ -404,6 +405,7 @@ class InstancesResource(SyncAPIResource):
         self,
         id: str,
         *,
+        graceful_shutdown: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -415,6 +417,8 @@ class InstancesResource(SyncAPIResource):
         Stop and delete instance
 
         Args:
+          graceful_shutdown: Whether to attempt graceful guest shutdown before deleting the instance
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -429,7 +433,13 @@ class InstancesResource(SyncAPIResource):
         return self._delete(
             path_template("/instances/{id}", id=id),
             options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                query=maybe_transform(
+                    {"graceful_shutdown": graceful_shutdown}, instance_delete_params.InstanceDeleteParams
+                ),
             ),
             cast_to=NoneType,
         )
@@ -1217,6 +1227,7 @@ class AsyncInstancesResource(AsyncAPIResource):
         self,
         id: str,
         *,
+        graceful_shutdown: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -1228,6 +1239,8 @@ class AsyncInstancesResource(AsyncAPIResource):
         Stop and delete instance
 
         Args:
+          graceful_shutdown: Whether to attempt graceful guest shutdown before deleting the instance
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -1242,7 +1255,13 @@ class AsyncInstancesResource(AsyncAPIResource):
         return await self._delete(
             path_template("/instances/{id}", id=id),
             options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                query=await async_maybe_transform(
+                    {"graceful_shutdown": graceful_shutdown}, instance_delete_params.InstanceDeleteParams
+                ),
             ),
             cast_to=NoneType,
         )
