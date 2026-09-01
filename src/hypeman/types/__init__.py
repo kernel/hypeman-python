@@ -36,6 +36,7 @@ from .snapshot_policy import SnapshotPolicy as SnapshotPolicy
 from .available_device import AvailableDevice as AvailableDevice
 from .build_provenance import BuildProvenance as BuildProvenance
 from .health_check_tcp import HealthCheckTcp as HealthCheckTcp
+from .image_tag_params import ImageTagParams as ImageTagParams
 from .build_list_params import BuildListParams as BuildListParams
 from .capabilities_host import CapabilitiesHost as CapabilitiesHost
 from .health_check_exec import HealthCheckExec as HealthCheckExec

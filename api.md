@@ -41,7 +41,7 @@ Methods:
 Types:
 
 ```python
-from hypeman.types import Image, ImageListResponse
+from hypeman.types import Image, TagImageRequest, ImageListResponse
 ```
 
 Methods:
@@ -50,6 +50,7 @@ Methods:
 - <code title="get /images">client.images.<a href="./src/hypeman/resources/images.py">list</a>(\*\*<a href="src/hypeman/types/image_list_params.py">params</a>) -> <a href="./src/hypeman/types/image_list_response.py">ImageListResponse</a></code>
 - <code title="delete /images/{name}">client.images.<a href="./src/hypeman/resources/images.py">delete</a>(name) -> None</code>
 - <code title="get /images/{name}">client.images.<a href="./src/hypeman/resources/images.py">get</a>(name) -> <a href="./src/hypeman/types/image.py">Image</a></code>
+- <code title="post /images/{name}/tag">client.images.<a href="./src/hypeman/resources/images.py">tag</a>(name, \*\*<a href="src/hypeman/types/image_tag_params.py">params</a>) -> <a href="./src/hypeman/types/image.py">Image</a></code>
 
 # Instances
 

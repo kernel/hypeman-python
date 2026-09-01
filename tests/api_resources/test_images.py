@@ -9,7 +9,10 @@ import pytest
 
 from hypeman import Hypeman, AsyncHypeman
 from tests.utils import assert_matches_type
-from hypeman.types import Image, ImageListResponse
+from hypeman.types import (
+    Image,
+    ImageListResponse,
+)
 
 base_url = os.environ.get("TEST_API_BASE_URL", "http://127.0.0.1:4010")
 
@@ -192,6 +195,52 @@ class TestImages:
                 "",
             )
 
+    @pytest.mark.skip(reason="Mock server tests are disabled")
+    @parametrize
+    def test_method_tag(self, client: Hypeman) -> None:
+        image = client.images.tag(
+            name="name",
+            target="docker.io/library/nginx:stable",
+        )
+        assert_matches_type(Image, image, path=["response"])
+
+    @pytest.mark.skip(reason="Mock server tests are disabled")
+    @parametrize
+    def test_raw_response_tag(self, client: Hypeman) -> None:
+        response = client.images.with_raw_response.tag(
+            name="name",
+            target="docker.io/library/nginx:stable",
+        )
+
+        assert response.is_closed is True
+        assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+        image = response.parse()
+        assert_matches_type(Image, image, path=["response"])
+
+    @pytest.mark.skip(reason="Mock server tests are disabled")
+    @parametrize
+    def test_streaming_response_tag(self, client: Hypeman) -> None:
+        with client.images.with_streaming_response.tag(
+            name="name",
+            target="docker.io/library/nginx:stable",
+        ) as response:
+            assert not response.is_closed
+            assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+
+            image = response.parse()
+            assert_matches_type(Image, image, path=["response"])
+
+        assert cast(Any, response.is_closed) is True
+
+    @pytest.mark.skip(reason="Mock server tests are disabled")
+    @parametrize
+    def test_path_params_tag(self, client: Hypeman) -> None:
+        with pytest.raises(ValueError, match=r"Expected a non-empty value for `name` but received ''"):
+            client.images.with_raw_response.tag(
+                name="",
+                target="docker.io/library/nginx:stable",
+            )
+
 
 class TestAsyncImages:
     parametrize = pytest.mark.parametrize(
@@ -371,4 +420,50 @@ class TestAsyncImages:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `name` but received ''"):
             await async_client.images.with_raw_response.get(
                 "",
+            )
+
+    @pytest.mark.skip(reason="Mock server tests are disabled")
+    @parametrize
+    async def test_method_tag(self, async_client: AsyncHypeman) -> None:
+        image = await async_client.images.tag(
+            name="name",
+            target="docker.io/library/nginx:stable",
+        )
+        assert_matches_type(Image, image, path=["response"])
+
+    @pytest.mark.skip(reason="Mock server tests are disabled")
+    @parametrize
+    async def test_raw_response_tag(self, async_client: AsyncHypeman) -> None:
+        response = await async_client.images.with_raw_response.tag(
+            name="name",
+            target="docker.io/library/nginx:stable",
+        )
+
+        assert response.is_closed is True
+        assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+        image = await response.parse()
+        assert_matches_type(Image, image, path=["response"])
+
+    @pytest.mark.skip(reason="Mock server tests are disabled")
+    @parametrize
+    async def test_streaming_response_tag(self, async_client: AsyncHypeman) -> None:
+        async with async_client.images.with_streaming_response.tag(
+            name="name",
+            target="docker.io/library/nginx:stable",
+        ) as response:
+            assert not response.is_closed
+            assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+
+            image = await response.parse()
+            assert_matches_type(Image, image, path=["response"])
+
+        assert cast(Any, response.is_closed) is True
+
+    @pytest.mark.skip(reason="Mock server tests are disabled")
+    @parametrize
+    async def test_path_params_tag(self, async_client: AsyncHypeman) -> None:
+        with pytest.raises(ValueError, match=r"Expected a non-empty value for `name` but received ''"):
+            await async_client.images.with_raw_response.tag(
+                name="",
+                target="docker.io/library/nginx:stable",
             )

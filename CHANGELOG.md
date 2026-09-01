@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.28.0](https://github.com/kernel/hypeman-python/compare/v0.27.0...v0.28.0) (2026-09-01)
+
+
+### Features
+
+* Add local image tagging on shared content storage ([a466b24](https://github.com/kernel/hypeman-python/commit/a466b241a26272ca1e1e1c5ba0d787c3e26ed582))
+
 ## [0.27.0](https://github.com/kernel/hypeman-python/compare/v0.2.0...v0.27.0) (2026-08-31)
 
 
