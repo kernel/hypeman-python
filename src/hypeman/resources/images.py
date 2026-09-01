@@ -6,7 +6,7 @@ from typing import Dict
 
 import httpx
 
-from ..types import image_list_params, image_create_params
+from ..types import image_tag_params, image_list_params, image_create_params
 from .._types import Body, Omit, Query, Headers, NoneType, NotGiven, omit, not_given
 from .._utils import path_template, maybe_transform, async_maybe_transform
 from .._compat import cached_property
@@ -206,6 +206,44 @@ class ImagesResource(SyncAPIResource):
             cast_to=Image,
         )
 
+    def tag(
+        self,
+        name: str,
+        *,
+        target: str,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> Image:
+        """
+        Create or update a local image tag
+
+        Args:
+          target: Target OCI image reference with a tag. The local tag points to the source image
+              without pulling it again.
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        if not name:
+            raise ValueError(f"Expected a non-empty value for `name` but received {name!r}")
+        return self._post(
+            path_template("/images/{name}/tag", name=name),
+            body=maybe_transform({"target": target}, image_tag_params.ImageTagParams),
+            options=make_request_options(
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+            ),
+            cast_to=Image,
+        )
+
 
 class AsyncImagesResource(AsyncAPIResource):
     @cached_property
@@ -388,6 +426,44 @@ class AsyncImagesResource(AsyncAPIResource):
             cast_to=Image,
         )
 
+    async def tag(
+        self,
+        name: str,
+        *,
+        target: str,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> Image:
+        """
+        Create or update a local image tag
+
+        Args:
+          target: Target OCI image reference with a tag. The local tag points to the source image
+              without pulling it again.
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        if not name:
+            raise ValueError(f"Expected a non-empty value for `name` but received {name!r}")
+        return await self._post(
+            path_template("/images/{name}/tag", name=name),
+            body=await async_maybe_transform({"target": target}, image_tag_params.ImageTagParams),
+            options=make_request_options(
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+            ),
+            cast_to=Image,
+        )
+
 
 class ImagesResourceWithRawResponse:
     def __init__(self, images: ImagesResource) -> None:
@@ -404,6 +480,9 @@ class ImagesResourceWithRawResponse:
         )
         self.get = to_raw_response_wrapper(
             images.get,
+        )
+        self.tag = to_raw_response_wrapper(
+            images.tag,
         )
 
 
@@ -423,6 +502,9 @@ class AsyncImagesResourceWithRawResponse:
         self.get = async_to_raw_response_wrapper(
             images.get,
         )
+        self.tag = async_to_raw_response_wrapper(
+            images.tag,
+        )
 
 
 class ImagesResourceWithStreamingResponse:
@@ -441,6 +523,9 @@ class ImagesResourceWithStreamingResponse:
         self.get = to_streamed_response_wrapper(
             images.get,
         )
+        self.tag = to_streamed_response_wrapper(
+            images.tag,
+        )
 
 
 class AsyncImagesResourceWithStreamingResponse:
@@ -458,4 +543,7 @@ class AsyncImagesResourceWithStreamingResponse:
         )
         self.get = async_to_streamed_response_wrapper(
             images.get,
+        )
+        self.tag = async_to_streamed_response_wrapper(
+            images.tag,
         )
