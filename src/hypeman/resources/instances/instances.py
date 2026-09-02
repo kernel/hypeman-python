@@ -536,7 +536,7 @@ class InstancesResource(SyncAPIResource):
         id: str,
         *,
         follow: bool | Omit = omit,
-        source: Literal["app", "vmm", "hypeman"] | Omit = omit,
+        source: Literal["app", "vmm", "hypeman", "swtpm"] | Omit = omit,
         tail: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -1358,7 +1358,7 @@ class AsyncInstancesResource(AsyncAPIResource):
         id: str,
         *,
         follow: bool | Omit = omit,
-        source: Literal["app", "vmm", "hypeman"] | Omit = omit,
+        source: Literal["app", "vmm", "hypeman", "swtpm"] | Omit = omit,
         tail: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
