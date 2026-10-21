@@ -200,16 +200,19 @@ class InstancesResource(SyncAPIResource):
 
           network: Network configuration for the instance
 
-          overlay_size: Writable overlay disk size (human-readable format like "10GB", "50G")
+          overlay_size: Writable overlay disk size (human-readable format like "10GB", "50G"). Omit this
+              field for macOS guests, which clone the image's complete boot disk instead.
 
-          platform: Target platform as os/arch[/variant] (e.g. "linux/amd64"), matching Docker
-              --platform. Omit for the host platform. Not a fixed enum: the os/arch[/variant]
-              grammar is validated server-side and invalid values return 400 invalid_platform.
-              Only os "linux" with arch amd64 or arm64 is accepted today.
+          platform: Target platform as os/arch[/variant]. Linux container guests support amd64 and
+              arm64. Experimental darwin/arm64 guests require an offline-imported macOS disk
+              image and vz on Apple silicon. Omit to use the cached native image or host
+              platform.
 
           restart_policy: Whole-instance restart supervision policy.
 
-          size: Base memory size (human-readable format like "1GB", "512MB", "2G")
+          size: Base memory size (human-readable format like "1GB", "512MB", "2G"). macOS guests
+              default to their image's memory; explicit sizes must be at least 4 GiB in whole
+              MiB and within VZ host limits.
 
           skip_guest_agent: Skip guest-agent installation during boot. When true, the exec and stat APIs
               will not work for this instance. The instance will still run, but remote command
@@ -230,7 +233,8 @@ class InstancesResource(SyncAPIResource):
               omit both expiration fields to disable automatic expiration. Mutually exclusive
               with expires_at.
 
-          vcpus: Number of virtual CPUs
+          vcpus: Number of virtual CPUs. macOS guests default to their image's vCPUs; explicit
+              counts must be at least 2 and within VZ host limits.
 
           volumes: Volumes to attach to the instance at creation time
 
@@ -1022,16 +1026,19 @@ class AsyncInstancesResource(AsyncAPIResource):
 
           network: Network configuration for the instance
 
-          overlay_size: Writable overlay disk size (human-readable format like "10GB", "50G")
+          overlay_size: Writable overlay disk size (human-readable format like "10GB", "50G"). Omit this
+              field for macOS guests, which clone the image's complete boot disk instead.
 
-          platform: Target platform as os/arch[/variant] (e.g. "linux/amd64"), matching Docker
-              --platform. Omit for the host platform. Not a fixed enum: the os/arch[/variant]
-              grammar is validated server-side and invalid values return 400 invalid_platform.
-              Only os "linux" with arch amd64 or arm64 is accepted today.
+          platform: Target platform as os/arch[/variant]. Linux container guests support amd64 and
+              arm64. Experimental darwin/arm64 guests require an offline-imported macOS disk
+              image and vz on Apple silicon. Omit to use the cached native image or host
+              platform.
 
           restart_policy: Whole-instance restart supervision policy.
 
-          size: Base memory size (human-readable format like "1GB", "512MB", "2G")
+          size: Base memory size (human-readable format like "1GB", "512MB", "2G"). macOS guests
+              default to their image's memory; explicit sizes must be at least 4 GiB in whole
+              MiB and within VZ host limits.
 
           skip_guest_agent: Skip guest-agent installation during boot. When true, the exec and stat APIs
               will not work for this instance. The instance will still run, but remote command
@@ -1052,7 +1059,8 @@ class AsyncInstancesResource(AsyncAPIResource):
               omit both expiration fields to disable automatic expiration. Mutually exclusive
               with expires_at.
 
-          vcpus: Number of virtual CPUs
+          vcpus: Number of virtual CPUs. macOS guests default to their image's vCPUs; explicit
+              counts must be at least 2 and within VZ host limits.
 
           volumes: Volumes to attach to the instance at creation time
 
