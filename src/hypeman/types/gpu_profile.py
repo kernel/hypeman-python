@@ -9,10 +9,10 @@ class GPUProfile(BaseModel):
     """Available vGPU profile"""
 
     available: int
-    """Number of virtual functions currently able to create this profile.
-
-    Best-effort: creating an instance may reduce availability on sibling functions
-    sharing GPU framebuffer.
+    """
+    Number of additional instances of this profile the host can take if only this
+    profile is added. Counts for different profiles are not additive: an instance of
+    one profile can reduce availability of others on the same GPU.
     """
 
     framebuffer_mb: int
