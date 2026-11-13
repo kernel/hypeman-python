@@ -19,8 +19,11 @@ __all__ = ["Instance", "GPU", "Network"]
 class GPU(BaseModel):
     """GPU information attached to the instance"""
 
+    device_path: Optional[str] = None
+    """sysfs path of the assigned vGPU device"""
+
     mdev_uuid: Optional[str] = None
-    """mdev device UUID"""
+    """mdev device UUID (mdev hosts only)"""
 
     profile: Optional[str] = None
     """vGPU profile name"""
