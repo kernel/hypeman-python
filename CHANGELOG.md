@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.29.0](https://github.com/kernel/hypeman-python/compare/v0.28.0...v0.29.0) (2026-11-13)
+
+
+### Features
+
+* Add Windows hypervisor primitives ([5c037b9](https://github.com/kernel/hypeman-python/commit/5c037b9f9c5926025ba9e5852bea964b4e1ace7c))
+* Integrate vendor VFIO vGPUs into the instance lifecycle ([24934bb](https://github.com/kernel/hypeman-python/commit/24934bb5e6f4a2ab636e0d893d056276ce2fd3dd))
+* Place vGPU profiles the driver hides from creatable lists ([3578ec1](https://github.com/kernel/hypeman-python/commit/3578ec14db5cf79817e7e8606c9e260865deafd3))
+* Update Hypeman build toolchains to Go 1.26.10 ([6a79c69](https://github.com/kernel/hypeman-python/commit/6a79c6927c90a1b35c971dcb749d1cddc0ecf8e3))
+
 ## [0.28.0](https://github.com/kernel/hypeman-python/compare/v0.27.0...v0.28.0) (2026-09-01)
 
 
