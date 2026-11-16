@@ -13,6 +13,7 @@ from ...types import (
     instance_list_params,
     instance_logs_params,
     instance_stat_params,
+    instance_stop_params,
     instance_wait_params,
     instance_start_params,
     instance_create_params,
@@ -823,6 +824,7 @@ class InstancesResource(SyncAPIResource):
         self,
         id: str,
         *,
+        force: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -831,9 +833,14 @@ class InstancesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Instance:
         """
-        Stop instance (graceful shutdown)
+        Stop instance (graceful shutdown, or forced power-off)
 
         Args:
+          force: Power the VM off without asking the guest to shut down. Use when the guest state
+              will be discarded, for example before restoring a snapshot. A forced stop of a
+              macOS guest is never graceful, so it cannot be used for a stopped snapshot or
+              fork until the guest is booted and stopped gracefully again.
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -846,6 +853,7 @@ class InstancesResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._post(
             path_template("/instances/{id}/stop", id=id),
+            body=maybe_transform({"force": force}, instance_stop_params.InstanceStopParams),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -1649,6 +1657,7 @@ class AsyncInstancesResource(AsyncAPIResource):
         self,
         id: str,
         *,
+        force: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -1657,9 +1666,14 @@ class AsyncInstancesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Instance:
         """
-        Stop instance (graceful shutdown)
+        Stop instance (graceful shutdown, or forced power-off)
 
         Args:
+          force: Power the VM off without asking the guest to shut down. Use when the guest state
+              will be discarded, for example before restoring a snapshot. A forced stop of a
+              macOS guest is never graceful, so it cannot be used for a stopped snapshot or
+              fork until the guest is booted and stopped gracefully again.
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -1672,6 +1686,7 @@ class AsyncInstancesResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._post(
             path_template("/instances/{id}/stop", id=id),
+            body=await async_maybe_transform({"force": force}, instance_stop_params.InstanceStopParams),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
