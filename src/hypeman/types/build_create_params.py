@@ -55,6 +55,20 @@ class BuildCreateParams(TypedDict, total=False):
     memory_mb: int
     """Memory limit for builder VM in MB (default 2048)"""
 
+    registry_credentials: str
+    """
+    JSON object mapping exact registry hosts (no scheme or path) to objects with
+    required username/password strings and optional RFC3339 expires_at. At most 16
+    registries; credentials cannot override Hypeman's local output registry. No
+    CR/LF in values. Held in host memory for at most 30 minutes from submission, or
+    the earliest expires_at, including queue time. Passed to the ephemeral builder's
+    Docker auth config over vsock, never saved in host build metadata/config, and
+    removed at build completion/cancellation. Requires an updated builder image. No
+    automatic refresh or restart recovery: resubmit interrupted/expired builds with
+    fresh credentials. Credentialed builds pull directly in BuildKit rather than
+    populating the shared base-image mirror. Omit or use {} for existing behavior.
+    """
+
     secrets: str
     """
     JSON array of secret references to inject during build. Each object has "id"
