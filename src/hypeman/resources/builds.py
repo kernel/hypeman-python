@@ -60,6 +60,7 @@ class BuildsResource(SyncAPIResource):
         image_name: str | Omit = omit,
         is_admin_build: str | Omit = omit,
         memory_mb: int | Omit = omit,
+        registry_credentials: str | Omit = omit,
         secrets: str | Omit = omit,
         tags: str | Omit = omit,
         timeout_seconds: int | Omit = omit,
@@ -102,6 +103,17 @@ class BuildsResource(SyncAPIResource):
 
           memory_mb: Memory limit for builder VM in MB (default 2048)
 
+          registry_credentials: JSON object mapping exact registry hosts (no scheme or path) to objects with
+              required username/password strings and optional RFC3339 expires_at. At most 16
+              registries; credentials cannot override Hypeman's local output registry. No
+              CR/LF in values. Held in host memory for at most 30 minutes from submission, or
+              the earliest expires_at, including queue time. Passed to the ephemeral builder's
+              Docker auth config over vsock, never saved in host build metadata/config, and
+              removed at build completion/cancellation. Requires an updated builder image. No
+              automatic refresh or restart recovery: resubmit interrupted/expired builds with
+              fresh credentials. Credentialed builds pull directly in BuildKit rather than
+              populating the shared base-image mirror. Omit or use {} for existing behavior.
+
           secrets: JSON array of secret references to inject during build. Each object has "id"
               (required) for use with --mount=type=secret,id=... Example: [{"id":
               "npm_token"}, {"id": "github_token"}]
@@ -130,6 +142,7 @@ class BuildsResource(SyncAPIResource):
                 "image_name": image_name,
                 "is_admin_build": is_admin_build,
                 "memory_mb": memory_mb,
+                "registry_credentials": registry_credentials,
                 "secrets": secrets,
                 "tags": tags,
                 "timeout_seconds": timeout_seconds,
@@ -339,6 +352,7 @@ class AsyncBuildsResource(AsyncAPIResource):
         image_name: str | Omit = omit,
         is_admin_build: str | Omit = omit,
         memory_mb: int | Omit = omit,
+        registry_credentials: str | Omit = omit,
         secrets: str | Omit = omit,
         tags: str | Omit = omit,
         timeout_seconds: int | Omit = omit,
@@ -381,6 +395,17 @@ class AsyncBuildsResource(AsyncAPIResource):
 
           memory_mb: Memory limit for builder VM in MB (default 2048)
 
+          registry_credentials: JSON object mapping exact registry hosts (no scheme or path) to objects with
+              required username/password strings and optional RFC3339 expires_at. At most 16
+              registries; credentials cannot override Hypeman's local output registry. No
+              CR/LF in values. Held in host memory for at most 30 minutes from submission, or
+              the earliest expires_at, including queue time. Passed to the ephemeral builder's
+              Docker auth config over vsock, never saved in host build metadata/config, and
+              removed at build completion/cancellation. Requires an updated builder image. No
+              automatic refresh or restart recovery: resubmit interrupted/expired builds with
+              fresh credentials. Credentialed builds pull directly in BuildKit rather than
+              populating the shared base-image mirror. Omit or use {} for existing behavior.
+
           secrets: JSON array of secret references to inject during build. Each object has "id"
               (required) for use with --mount=type=secret,id=... Example: [{"id":
               "npm_token"}, {"id": "github_token"}]
@@ -409,6 +434,7 @@ class AsyncBuildsResource(AsyncAPIResource):
                 "image_name": image_name,
                 "is_admin_build": is_admin_build,
                 "memory_mb": memory_mb,
+                "registry_credentials": registry_credentials,
                 "secrets": secrets,
                 "tags": tags,
                 "timeout_seconds": timeout_seconds,

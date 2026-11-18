@@ -97,7 +97,7 @@ Methods:
 - <code title="post /instances/{id}/start">client.instances.<a href="./src/hypeman/resources/instances/instances.py">start</a>(id, \*\*<a href="src/hypeman/types/instance_start_params.py">params</a>) -> <a href="./src/hypeman/types/instance.py">Instance</a></code>
 - <code title="get /instances/{id}/stat">client.instances.<a href="./src/hypeman/resources/instances/instances.py">stat</a>(id, \*\*<a href="src/hypeman/types/instance_stat_params.py">params</a>) -> <a href="./src/hypeman/types/path_info.py">PathInfo</a></code>
 - <code title="get /instances/{id}/stats">client.instances.<a href="./src/hypeman/resources/instances/instances.py">stats</a>(id) -> <a href="./src/hypeman/types/instance_stats.py">InstanceStats</a></code>
-- <code title="post /instances/{id}/stop">client.instances.<a href="./src/hypeman/resources/instances/instances.py">stop</a>(id) -> <a href="./src/hypeman/types/instance.py">Instance</a></code>
+- <code title="post /instances/{id}/stop">client.instances.<a href="./src/hypeman/resources/instances/instances.py">stop</a>(id, \*\*<a href="src/hypeman/types/instance_stop_params.py">params</a>) -> <a href="./src/hypeman/types/instance.py">Instance</a></code>
 - <code title="get /instances/{id}/wait">client.instances.<a href="./src/hypeman/resources/instances/instances.py">wait</a>(id, \*\*<a href="src/hypeman/types/instance_wait_params.py">params</a>) -> <a href="./src/hypeman/types/wait_for_state_response.py">WaitForStateResponse</a></code>
 
 ## AutoStandby

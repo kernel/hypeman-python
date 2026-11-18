@@ -11,7 +11,7 @@ class InstanceLogsParams(TypedDict, total=False):
     follow: bool
     """Continue streaming new lines after initial output"""
 
-    source: Literal["app", "vmm", "hypeman"]
+    source: Literal["app", "vmm", "hypeman", "swtpm"]
     """Log source to stream:
 
     - app: Guest application logs (serial console output)

@@ -32,7 +32,10 @@ class InstanceStats(BaseModel):
     """Virtual Memory Size - total virtual memory allocated in bytes"""
 
     network_rx_bytes: int
-    """Total network bytes received by the VM (from TAP interface)"""
+    """Total network bytes received by the VM (from TAP interface).
+
+    Always 0 for macOS guests, which use NAT with no per-instance interface.
+    """
 
     network_tx_bytes: int
     """Total network bytes transmitted by the VM (from TAP interface)"""

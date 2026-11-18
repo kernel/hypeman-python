@@ -75,6 +75,7 @@ from .instance_fork_params import InstanceForkParams as InstanceForkParams
 from .instance_list_params import InstanceListParams as InstanceListParams
 from .instance_logs_params import InstanceLogsParams as InstanceLogsParams
 from .instance_stat_params import InstanceStatParams as InstanceStatParams
+from .instance_stop_params import InstanceStopParams as InstanceStopParams
 from .instance_wait_params import InstanceWaitParams as InstanceWaitParams
 from .restart_policy_param import RestartPolicyParam as RestartPolicyParam
 from .snapshot_fork_params import SnapshotForkParams as SnapshotForkParams
